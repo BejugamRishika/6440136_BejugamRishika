@@ -1,1 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Community Event Portal</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; }
+    #welcomeBanner { background-color: #007BFF; color: white; padding: 10px; text-align: center; }
+    .highlight { background-color: yellow; font-weight: bold; }
+    .gallery-img { border: 2px solid #ccc; padding: 5px; width: 100%; }
+    table { width: 100%; margin: 20px 0; }
+    caption { font-weight: bold; padding: 10px; }
+    form { margin: 20px; }
+    input, textarea, select { display: block; margin: 10px 0; padding: 5px; }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <a href="#home">Home</a> |
+    <a href="#events">Events</a> |
+    <a href="#contact">Contact</a> |
+    <a href="help.html" target="_blank">Help</a>
+  </nav>
+
+  <!-- Main -->
+  <main id="home">
+    <div id="welcomeBanner">
+      Welcome, <span style="color:red; font-weight:bold;">special offer today!</span>
+    </div>
+
+    <h2 class="highlight">Upcoming Community Events</h2>
+
+    <!-- Image Gallery -->
+    <section id="events">
+      <table>
+        <caption>Past Community Events</caption>
+        <tr>
+          <td><img src="event1.jpg" alt="Event 1" title="Community Clean-up" class="gallery-img"></td>
+          <td><img src="event2.jpg" alt="Event 2" title="Charity Run" class="gallery-img"></td>
+          <td><img src="event3.jpg" alt="Event 3" title="Music Night" class="gallery-img"></td>
+        </tr>
+        <tr>
+          <td><img src="event4.jpg" alt="Event 4" title="Food Drive" class="gallery-img" ondblclick="enlarge(this)"></td>
+          <td><img src="event5.jpg" alt="Event 5" title="Art Fair" class="gallery-img"></td>
+          <td><img src="event6.jpg" alt="Event 6" title="Book Swap" class="gallery-img"></td>
+        </tr>
+      </table>
+    </section>
+
+    <!-- Registration Form -->
+    <section>
+      <h2>Register for an Event</h2>
+      <form id="registrationForm" onsubmit="confirmSubmit(event)">
+        <input type="text" name="name" placeholder="Your Name" required autofocus>
+        <input type="email" name="email" placeholder="Your Email" required>
+        <input type="date" name="eventDate" required>
+        <select name="eventType" id="eventType" onchange="saveEventPreference(); showFee();">
+          <option value="">Select Event Type</option>
+          <option value="cleanup">Clean-up</option>
+          <option value="run">Charity Run</option>
+          <option value="music">Music Night</option>
+        </select>
+        <textarea placeholder="Your Message"></textarea>
+        <input type="tel" name="phone" placeholder="Phone Number" onblur="validatePhone(this)">
+        <output id="formOutput"></output><br>
+        <button type="submit" onclick="showConfirmation()">Submit</button>
+        <button type="button" onclick="clearPreferences()">Clear Preferences</button>
+      </form>
+    </section>
+
+    <!-- Feedback -->
+    <section>
+      <h2>Feedback</h2>
+      <textarea id="feedbackArea" onkeyup="countChars()" placeholder="Share your thoughts..."></textarea>
+      <div>Characters typed: <span id="charCount">0</span></div>
+    </section>
+
+    <!-- Video -->
+    <section>
+      <h2>Event Promo Video</h2>
+      <video width="320" height="240" controls oncanplay="videoReadyMessage()">
+        <source src="promo.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <p id="videoMessage"></p>
+    </section>
+
+    <!-- Geolocation -->
+    <section>
+      <button onclick="findNearbyEvents()">Find Nearby Events</button>
+      <div id="geoLocationResult"></div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Local Community Council</p>
+  </footer>
+
+  <script>
+    // Form Submission Output
+    function confirmSubmit(e) {
+      e.preventDefault();
+      document.getElementById('formOutput').textContent = "Registration successful!";
+    }
+
+    // Phone Validation
+    function validatePhone(input) {
+      const regex = /^\d{10}$/;
+      if (!regex.test(input.value)) {
+        alert("Enter a valid 10-digit phone number.");
+      }
+    }
+
+    // Event Fee Display
+    function showFee() {
+      const type = document.getElementById("eventType").value;
+      alert("Selected event fee: $" + (type === "run" ? "10" : type === "music" ? "15" : "0"));
+    }
+
+    // Confirmation on Click
+    function showConfirmation() {
+      console.log("Form submitted");
+    }
+
+    // Enlarge Image on Double Click
+    function enlarge(img) {
+      img.style.transform = "scale(1.5)";
+      img.style.transition = "0.3s";
+    }
+
+    // Character Count
+    function countChars() {
+      const count = document.getElementById("feedbackArea").value.length;
+      document.getElementById("charCount").textContent = count;
+    }
+
+    // Video Ready Message
+    function videoReadyMessage() {
+      document.getElementById("videoMessage").textContent = "Video ready to play!";
+    }
+
+    // Geolocation
+    function findNearbyEvents() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition, showError, { enableHighAccuracy: true, timeout: 10000 });
+      } else {
+        document.getElementById("geoLocationResult").textContent = "Geolocation not supported.";
+      }
+    }
+
+    function showPosition(position) {
+      document.getElementById("geoLocationResult").textContent =
+        `Latitude: ${position.coords.latitude}, Longitude: ${position.coords.longitude}`;
+    }
+
+    function showError(error) {
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          alert("User denied the request for Geolocation.");
+          break;
+        case error.TIMEOUT:
+          alert("The request to get user location timed out.");
+          break;
+      }
+    }
+
+    // Save & Retrieve Preferences
+    function saveEventPreference() {
+      const type = document.getElementById("eventType").value;
+      localStorage.setItem("preferredEvent", type);
+    }
+
+    function clearPreferences() {
+      localStorage.clear();
+      sessionStorage.clear();
+      alert("Preferences cleared.");
+    }
+
+    window.onload = () => {
+      const preferred = localStorage.getItem("preferredEvent");
+      if (preferred) {
+        document.getElementById("eventType").value = preferred;
+      }
+    };
+
+    // Warn on leaving unfinished form
+    window.onbeforeunload = function (e) {
+      if (document.getElementById("registrationForm").checkValidity() === false) {
+        return "You have unsaved changes!";
+      }
+    };
+  </script>
+</body>
+</html>
 
